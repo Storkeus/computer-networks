@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 
     connect(fd, (struct sockaddr *)&addr, sizeof(addr));
 
-const char* message="bartek\npasswor3d\nbartek@127.0.0.1\nTest\nLoremIpsum\nABC";
+const char* message="bartek\npassword\nkarolina@127.0.0.1\nTest\nLoremIpsum\nABC";
     write(fd, message, strlen(message));
     char data[255];
     int responseSize = read(fd, data, 255);

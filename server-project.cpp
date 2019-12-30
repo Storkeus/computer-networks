@@ -13,6 +13,7 @@
 #include <string>
 #include "lib/struct/User.cpp"
 #include "lib/class/Message.cpp"
+#include <ctime>
 
 int writeAll(int fd, const char *buf, size_t n)
 {
@@ -37,7 +38,7 @@ int readAll(int fd, void *buf, size_t n)
 
 int main(int argc, char **argv)
 {
-
+srand(time(0));
     const User users[2] = {{"bartek", "password"}, {"karolina", "123456789"}};
 
     int fd = socket(PF_INET, SOCK_STREAM, 0);
@@ -110,15 +111,11 @@ int main(int argc, char **argv)
             {
 
                 fda -= 1;
-                std::cout << "Test0" << std::endl
-                          << std::flush;
 
                 responseSize = readAll(cfd, data, bufforSize);
 
-                std::cout << "Test1" << std::endl
-                          << std::flush;
                 std::string loadedData = "";
-                std::cout << "Test2" << std::endl;
+
                 for (int j = 0; j < responseSize; j++)
                 {
 
@@ -142,6 +139,8 @@ int main(int argc, char **argv)
 
                 if (message.isAuthorized(users,2))
                 {
+                    message.saveOut();
+                    message.saveIn();
                     writeAll(cfd, message.content.c_str(), message.content.length() + 1);
                 }
                 else
