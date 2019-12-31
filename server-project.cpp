@@ -38,7 +38,7 @@ int readAll(int fd, void *buf, size_t n)
 
 int main(int argc, char **argv)
 {
-srand(time(0));
+    srand(time(0));
     const User users[2] = {{"bartek", "password"}, {"karolina", "123456789"}};
 
     int fd = socket(PF_INET, SOCK_STREAM, 0);
@@ -137,16 +137,24 @@ srand(time(0));
 
                 fda -= 1;
 
-                if (message.isAuthorized(users,2))
+                if (message.isAuthorized(users, 2))
                 {
-                    message.saveOut();
-                    message.saveIn();
-                    writeAll(cfd, message.content.c_str(), message.content.length() + 1);
+                    message.saveOut(); //zapis w folderze "wysłane"
+                    if (message.isAtReciverServer())
+                    {
+                        message.saveIn(); //zapis w folderze "odebrane"
+                        //writeAll(cfd, message.content.c_str(), message.content.length() + 1);
+                    }
+                    else
+                    {
+                        message.send();//wysłanie wiadomości na serwer docelowy
+                    }
+
                 }
                 else
                 {
-                    const char* errorMessage="Nieprawidłowy login lub hasło";
-                    writeAll(cfd,  errorMessage, strlen(errorMessage));
+                    const char *errorMessage = "Nieprawidłowy login lub hasło";
+                    writeAll(cfd, errorMessage, strlen(errorMessage));
                 }
 
                 close(i);
