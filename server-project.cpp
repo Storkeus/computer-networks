@@ -137,24 +137,26 @@ int main(int argc, char **argv)
 
                 fda -= 1;
 
-                if (message.isAuthorized(users, 2))
+                if (message.isAtReciverServer())
                 {
-                    message.saveOut(); //zapis w folderze "wysłane"
-                    if (message.isAtReciverServer())
-                    {
-                        message.saveIn(); //zapis w folderze "odebrane"
-                        //writeAll(cfd, message.content.c_str(), message.content.length() + 1);
-                    }
-                    else
-                    {
-                        message.send();//wysłanie wiadomości na serwer docelowy
-                    }
 
+                    message.saveIn(); //zapis w folderze "odebrane"
+                                      //writeAll(cfd, message.content.c_str(), message.content.length() + 1);
                 }
                 else
                 {
-                    const char *errorMessage = "Nieprawidłowy login lub hasło";
-                    writeAll(cfd, errorMessage, strlen(errorMessage));
+                    if (message.isAuthorized(users, 2))
+                    {
+                        message.saveOut(); //zapis w folderze "wysłane"
+                        message.send();    //wysłanie wiadomości na serwer docelowy
+                        const char *successMessage = "Wysłano wiadomość";
+                        writeAll(cfd, successMessage, strlen(successMessage));
+                    }
+                    else
+                    {
+                        const char *errorMessage = "Nieprawidłowy login lub hasło";
+                        writeAll(cfd, errorMessage, strlen(errorMessage));
+                    }
                 }
 
                 close(i);

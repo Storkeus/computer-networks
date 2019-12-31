@@ -14,6 +14,11 @@ private:
         return (bool)ifile;
     }
 
+    std::string getMessageBody()
+    {
+        return this->senderAddress + "\n" + this->reciverLogin + '@' + this->reciverServer + "\n" + this->content;
+    }
+
     std::string getRandomFileName(std::string path)
     {
         std::string chars =
@@ -34,9 +39,10 @@ private:
     void save(std::string path)
     {
         std::ofstream messageFile(path + getRandomFileName(path));
-        messageFile << this->reciverLogin << '@' << this->reciverServer << std::endl;
-        messageFile << this->content << std::endl;
+        messageFile << this->getMessageBody() << std::endl;
         messageFile.close();
+
+        std::cout<<this->content<<std::flush;
     }
 
 public:
@@ -44,12 +50,14 @@ public:
     std::string content;
     std::string reciverLogin;
     std::string reciverServer;
+    std::string senderAddress;
 
     void construct()
     {
         this->content = "";
         this->reciverLogin = "";
         this->reciverServer = "";
+        this->senderAddress = "";
         this->isEnd = "";
     }
 
@@ -67,15 +75,27 @@ public:
             return;
         }
 
-        if (this->user.login == "")
+        std::cout << "Obsługa połączenia. Typ: " << this->isEnd << std::endl
+                  << std::flush;
+        if (!this->isAtReciverServer())
         {
-            this->user.login = data.substr(0, data.length() - 1); //removes \n from end
-            return;
-        }
 
-        if (this->user.password == "")
+            if (this->user.login == "")
+            {
+                this->user.login = data.substr(0, data.length() - 1); //removes \n from end
+                return;
+            }
+
+            if (this->user.password == "")
+            {
+                this->user.password = data.substr(0, data.length() - 1); //removes \n from end
+                return;
+            }
+        }
+        if (this->senderAddress == "")
         {
-            this->user.password = data.substr(0, data.length() - 1); //removes \n from end
+
+            this->senderAddress = data.substr(0, data.length() - 1); //removes \n from end
             return;
         }
 
@@ -107,8 +127,18 @@ public:
             this->reciverLogin = login;
             this->reciverServer = server;
 
+
+
             return;
         }
+
+        if (this->senderAddress == "")
+        {
+            this->senderAddress = data.substr(0, data.length() - 1); //removes \n from end
+            return;
+        }
+
+
 
         this->content += data;
     }
@@ -141,8 +171,9 @@ public:
 
     void send()
     {
-
+        std::cout << "Sending message to reciver..." << this->reciverServer.c_str()<< std::flush;
         int fd = socket(PF_INET, SOCK_STREAM, 0);
+
         struct hostent *host;
         host = gethostbyname(this->reciverServer.c_str());
 
@@ -153,8 +184,9 @@ public:
 
         connect(fd, (struct sockaddr *)&addr, sizeof(addr));
 
-        std::string message = "1\n" + this->content;
-        write(fd, message.c_str(), message.length() + 1);
+        std::string message = "1\n" + this->getMessageBody();
+        std::cout << message << std::flush;
+        write(fd, message.c_str(), message.length());
 
         close(fd);
     }
