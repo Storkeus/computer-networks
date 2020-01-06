@@ -52,7 +52,7 @@ public:
     std::string reciverServer;
     std::string senderAddress;
 
-    void construct()
+     Message()
     {
         this->content = "";
         this->reciverLogin = "";
@@ -75,8 +75,8 @@ public:
             return;
         }
 
-        std::cout << "Obsługa połączenia. Typ: " << this->isEnd << std::endl
-                  << std::flush;
+        // std::cout << "Obsługa połączenia. Typ: " << this->isEnd << std::endl
+        //           << std::flush;
         if (!this->isAtReciverServer())
         {
 

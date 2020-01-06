@@ -8,12 +8,21 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/select.h>
-
 #include <iostream>
 #include <string>
 #include "lib/struct/User.cpp"
+#include "lib/struct/ResponseMessage.cpp"
 #include "lib/class/Message.cpp"
+#include "lib/class/MessageList.cpp"
 #include <ctime>
+
+enum ConnectionType
+{
+    SEND_HOME_SERVER,
+    SEND_RECIVER_SERVER,
+    GET_INBOX,
+    GET_OUTBOX
+};
 
 int writeAll(int fd, const char *buf, size_t n)
 {
@@ -105,7 +114,9 @@ int main(int argc, char **argv)
             }
             int responseSize;
             Message message;
-
+            MessageList messageList;
+            std::cout<<"Inicjalizacja Klasy Message List"<<std::endl<<std::flush;
+            ConnectionType connectionType;
             // Reading (reciving) data
             if (FD_ISSET(i, &rmask))
             {
@@ -116,13 +127,28 @@ int main(int argc, char **argv)
 
                 std::string loadedData = "";
 
+                connectionType =(ConnectionType)(data[0]-'0');
                 for (int j = 0; j < responseSize; j++)
                 {
-
                     loadedData += data[j];
                     if (data[j] == '\n' || j == responseSize - 1) //Nowa linia lub koniec wiadomości
                     {
-                        message.addData(loadedData);
+                        switch (connectionType)
+                        {
+                        case SEND_HOME_SERVER:
+                        case SEND_RECIVER_SERVER:
+                        {
+                            message.addData(loadedData);
+                            break;
+                        }
+                        case GET_INBOX:
+                        case GET_OUTBOX:
+                        {
+                            messageList.addData(loadedData);
+                            break;
+                        }
+                        }
+
                         loadedData = "";
                     }
                 }
@@ -136,14 +162,9 @@ int main(int argc, char **argv)
             {
 
                 fda -= 1;
-
-                if (message.isAtReciverServer())
+                switch (connectionType)
                 {
-
-                    message.saveIn(); //zapis w folderze "odebrane"
-                                      //writeAll(cfd, message.content.c_str(), message.content.length() + 1);
-                }
-                else
+                case SEND_HOME_SERVER:
                 {
                     if (message.isAuthorized(users, 2))
                     {
@@ -157,6 +178,20 @@ int main(int argc, char **argv)
                         const char *errorMessage = "Nieprawidłowy login lub hasło";
                         writeAll(cfd, errorMessage, strlen(errorMessage));
                     }
+                    break;
+                }
+                case SEND_RECIVER_SERVER:
+                {
+                    message.saveIn(); //zapis w folderze "odebrane"
+                    break;
+                }
+                case GET_INBOX:
+                case GET_OUTBOX:
+                {
+                    std::string list=messageList.get();
+                    writeAll(cfd, list.c_str(), list.length());
+                    break;
+                }
                 }
 
                 close(i);

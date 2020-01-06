@@ -33,8 +33,12 @@ int main(int argc, char **argv)
     //addr.sin_addr.s_addr=inet_addr(); //Serwer datetime
 
     connect(fd, (struct sockaddr *)&addr, sizeof(addr));
-
-const char* message="0\nbartek\npassword\nbartek@192.168.18.11\nkarolina@192.168.18.11\nTest\nLoremIpsum\nABC";
+/*
+wysłanie wiadomości: 0\nbartek\npassword\nbartek@192.168.18.11\nkarolina@192.168.18.12\nTest\nLoremIpsum\nABC
+pobranie folderu odebrane: 2\nbartek\npassword
+pobranie folderu wysłane: 3\nbartek\npassword
+*/
+const char* message="2\nkarolina\n123456789";
     write(fd, message, strlen(message));
     char data[255];
     int responseSize = read(fd, data, 255);
