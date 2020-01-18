@@ -115,7 +115,7 @@ int main(int argc, char **argv)
             int responseSize;
             Message message;
             MessageList messageList;
-            std::cout<<"Inicjalizacja Klasy Message List"<<std::endl<<std::flush;
+            //std::cout << "Inicjalizacja Klasy Message List" << std::endl<< std::flush;
             ConnectionType connectionType;
             // Reading (reciving) data
             if (FD_ISSET(i, &rmask))
@@ -127,7 +127,7 @@ int main(int argc, char **argv)
 
                 std::string loadedData = "";
 
-                connectionType =(ConnectionType)(data[0]-'0');
+                connectionType = (ConnectionType)(data[0] - '0');
                 for (int j = 0; j < responseSize; j++)
                 {
                     loadedData += data[j];
@@ -138,6 +138,7 @@ int main(int argc, char **argv)
                         case SEND_HOME_SERVER:
                         case SEND_RECIVER_SERVER:
                         {
+                             //std::cout<<"Zapis w "<<SEND_RECIVER_SERVER<<std::endl<<std::flush;
                             message.addData(loadedData);
                             break;
                         }
@@ -182,14 +183,24 @@ int main(int argc, char **argv)
                 }
                 case SEND_RECIVER_SERVER:
                 {
+
                     message.saveIn(); //zapis w folderze "odebrane"
                     break;
                 }
                 case GET_INBOX:
                 case GET_OUTBOX:
                 {
-                    std::string list=messageList.get();
-                    writeAll(cfd, list.c_str(), list.length());
+                    if (messageList.isAuthorized(users, 2))
+                    {
+                        std::string list = messageList.get();
+                        writeAll(cfd, list.c_str(), list.length());
+                    }
+                    else
+                    {
+                        const char *errorMessage = "Nieprawidłowy login lub hasło";
+                        writeAll(cfd, errorMessage, strlen(errorMessage));
+                    }
+
                     break;
                 }
                 }

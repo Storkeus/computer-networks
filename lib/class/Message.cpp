@@ -42,7 +42,7 @@ private:
         messageFile << this->getMessageBody() << std::endl;
         messageFile.close();
 
-        std::cout<<this->content<<std::flush;
+        //std::cout<<this->content<<std::flush;
     }
 
 public:
@@ -75,7 +75,7 @@ public:
             return;
         }
 
-        // std::cout << "Obsługa połączenia. Typ: " << this->isEnd << std::endl
+        // //std::cout << "Obsługa połączenia. Typ: " << this->isEnd << std::endl
         //           << std::flush;
         if (!this->isAtReciverServer())
         {
@@ -171,7 +171,9 @@ public:
 
     void send()
     {
-        std::cout << "Sending message to reciver..." << this->reciverServer.c_str()<< std::flush;
+                if(fork()==0)
+        {
+        //std::cout << "Sending message to reciver..." << this->reciverServer.c_str()<< std::flush;
         int fd = socket(PF_INET, SOCK_STREAM, 0);
 
         struct hostent *host;
@@ -185,9 +187,11 @@ public:
         connect(fd, (struct sockaddr *)&addr, sizeof(addr));
 
         std::string message = "1\n" + this->getMessageBody();
-        std::cout << message << std::flush;
+        //std::cout << message << std::flush;
         write(fd, message.c_str(), message.length());
 
         close(fd);
+        exit(0);
+        }
     }
 };

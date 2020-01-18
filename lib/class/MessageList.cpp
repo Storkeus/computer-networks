@@ -47,7 +47,7 @@ private:
 
     std::string getListAsText(std::string directory)
     {
-        std::string response = "";
+        std::string response = " \n";
         for (std::size_t i = 0; i < this->list.size(); ++i)
         {
             std::ifstream fileMessage;
@@ -66,6 +66,7 @@ private:
                 {
                     fileMessage >> message;
                     response += message+'\n';
+                    message="";
                 }
             }
             response += '\n';
@@ -86,7 +87,9 @@ public:
     {
         for (unsigned i = 0; i < numberOfUsers; i++)
         {
-
+            //std::cout<<std::endl<<std::flush;
+            //std::cout<<users[i].login <<" "<<users[i].password <<std::endl<<std::flush;
+            //std::cout<<this->user.login <<" "<<this->user.password <<std::endl<<std::flush;
             if (users[i].login == this->user.login && users[i].password == this->user.password)
             {
                 return true;
@@ -98,30 +101,27 @@ public:
     void addData(std::string data)
     {
 
-        std::cout << this->type << std::endl
-                  << std::flush;
+        //std::cout << this->type << std::endl<< std::flush;
         if (this->type == UNDEFINED)
         {
-            std::cout << "Typ:" << data << std::flush;
-            std::cout << this->type << std::endl
-                      << std::flush;
+            //std::cout << "Typ:" << data << std::flush;
+            //std::cout << this->type << std::endl << std::flush;
             this->type = (MessageListType)(data[0] - '0'); //removes \n from end
-            std::cout << this->type << std::endl
-                      << std::flush;
+            //std::cout << this->type << std::endl<< std::flush;
             return;
         }
 
         if (this->user.login == "")
         {
-            std::cout << "Login:" << data << std::flush;
+            //std::cout << "Login:" << data << std::flush;
             this->user.login = data.substr(0, data.length() - 1); //removes \n from end
             return;
         }
 
         if (this->user.password == "")
         {
-            std::cout << "Hasło:" << data << std::flush;
-            this->user.password = data.substr(0, data.length() - 1); //removes \n from end
+            //std::cout << "Hasło:" << data << std::flush;
+            this->user.password = data; //removes \n from end
             return;
         }
     }

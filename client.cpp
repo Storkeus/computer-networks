@@ -38,7 +38,7 @@ wysłanie wiadomości: 0\nbartek\npassword\nbartek@192.168.18.11\nkarolina@192.1
 pobranie folderu odebrane: 2\nbartek\npassword
 pobranie folderu wysłane: 3\nbartek\npassword
 */
-const char* message="2\nkarolina\n123456789";
+const char* message="0\nbartek\npassword\nbartek@127.0.0.1\nkarolina@127.0.0.1\nTest\nLoremIpsum\nABC";
     write(fd, message, strlen(message));
     char data[255];
     int responseSize = read(fd, data, 255);
